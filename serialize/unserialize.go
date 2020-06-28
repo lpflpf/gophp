@@ -150,6 +150,7 @@ func unMarshalArray(reader *bytes.Reader) (interface{}, error) {
 	var arrLen int
 	var err error
 	val := make(map[string]interface{})
+	var val2 []interface{}
 
 	arrLen, err = readLength(reader)
 
@@ -179,12 +180,13 @@ func unMarshalArray(reader *bytes.Reader) (interface{}, error) {
 		case string:
 			stringKey, _ := k.(string)
 			val[stringKey] = v
+			val2 = append(val2, v)
 		case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float32, float64:
 			// intKey, _ := k.(int)
 			// val[strconv.Itoa(intKey)] = v
 			stringKey, _ := utils.NumericalToString(k)
 			val[stringKey] = v
-
+			val2 = append(val2, v)
 			// stringI, _ := utils.NumericalToString(i)
 			if i == k {
 				indexLen++
@@ -202,11 +204,7 @@ func unMarshalArray(reader *bytes.Reader) (interface{}, error) {
 	}
 
 	if indexLen == arrLen {
-		var slice []interface{}
-		for _, row := range val {
-			slice = append(slice, row)
-		}
-		return slice, nil
+		return val2, nil
 	}
 
 	return val, nil
