@@ -1,3 +1,3 @@
-module github.com/techoner/gophp
+module github.com/lpflpf/gophp
 
 go 1.11
