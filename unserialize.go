@@ -1,10 +1,9 @@
-package serialize
+package gophp
 
 import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/lpflpf/gophp/utils"
 )
 
 var ErrNotExpectedType = errors.New("UnMarshal: Not expect type")
@@ -167,7 +166,7 @@ func unMarshalArray(reader *bytes.Reader) (interface{}, error) {
 			val[stringKey] = v
 			val2 = append(val2, v)
 		case int64:
-			stringKey, _ := utils.NumericalToString(k)
+			stringKey, _ := NumericalToString(k)
 			val[stringKey] = v
 			val2 = append(val2, v)
 
