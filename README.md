@@ -1,16 +1,16 @@
 go-serialize 
 ====
 
-[![Build Status](https://travis-ci.com/techleeone/gophp.svg?branch=master)](https://travis-ci.com/techleeone/gophp)
+[![Build Status](https://travis-ci.com/lpflpf/gophp.svg?branch=master)](https://travis-ci.com/lpflpf/gophp)
 
 
-Golang implementation for PHP's function serialize() and unserialize()
+Golang's implementation for PHP's function serialize() and unSerialize()
 
 
 ## Install / Update
 
 ```
-go get -u github.com/techleeone/gophp/serialize
+go get -u github.com/lpflpf/gophp
 ```
 
 ## Example
@@ -21,7 +21,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/techleeone/gophp/serialize"
+	"github.com/lpflpf/gophp"
 )
 
 func main() {
@@ -29,12 +29,12 @@ func main() {
 	str := `a:1:{s:3:"php";s:24:"世界上最好的语言";}`
 
 	// unserialize() in php
-	out, _ := serialize.UnMarshal([]byte(str))
+	out, _ := gophp.UnMarshal([]byte(str))
 
 	fmt.Println(out) //map[php:世界上最好的语言]
 
 	// serialize() in php
-	jsonbyte, _ := serialize.Marshal(out)
+	jsonbyte, _ := gophp.Marshal(out)
 
 	fmt.Println(string(jsonbyte)) // a:1:{s:3:"php";s:24:"世界上最好的语言";}
 
