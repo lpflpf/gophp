@@ -44,10 +44,6 @@ func LessValue(a, b reflect.Value) bool {
 	return aNumerical && !bNumerical
 }
 
-func LowerCaseFirstLetter(s string) string {
-	return strings.ToLower(s[0:1]) + s[1:]
-}
-
 func NumericalToString(value interface{}) (string, bool) {
 	var val string
 
