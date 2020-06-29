@@ -1,6 +1,7 @@
 package serialize
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -12,9 +13,48 @@ func TestUnMarshal(t *testing.T) {
 		panic(err)
 	}
 
-	_, ok := out.([]interface{})
+	expect := []interface{}{
+		map[string]interface{}{
+			"comment_count":         int64(520),
+			"display_url":           "/group/6616191620721148423/",
+			"pc_image_url":          "https://p99.pstatp.com/list/300x170/pgc-image/15404520275419b14c54a1a",
+			"title":                 "一段不幸的婚姻害死丈夫 妻子法庭上向家人下跪赎罪 婆婆情绪失控",
+			"video_duration":        int64(900),
+			"video_duration_format": "15:00",
+			"video_play_count":      int64(951011),
+		},
+		map[string]interface{}{
+			"comment_count":         int64(76),
+			"display_url":           "/group/6607288769219396103/",
+			"pc_image_url":          "https://p3.pstatp.com/list/300x170/cc390008433eac69241b",
+			"title":                 "重庆美女司机学车，教练说，你入党了么？笑翻了",
+			"video_duration":        int64(235),
+			"video_duration_format": "03:55",
+			"video_play_count":      int64(1587177),
+		},
+	}
+
+	ok := reflect.DeepEqual(out, expect)
 	if !ok {
 		t.Errorf("UnMarshal incorrectly, have got %t\n", out)
 	}
+}
 
+func TestUnMarshalObject(t *testing.T) {
+	input := `O:3:"foo":3:{s:4:"data";i:1;s:5:"data1";s:11:"hello world";s:5:"data2";a:3:{i:0;i:1;i:1;i:2;i:2;i:3;}}`
+
+	out, err := UnMarshal([]byte(input))
+	if err != nil {
+		panic(err)
+	}
+
+	var expectData interface{} = map[string]interface{}{
+		"data":  int64(1),
+		"data1": "hello world",
+		"data2": []interface{}{int64(1), int64(2), int64(3)},
+	}
+
+	if reflect.DeepEqual(out, expectData) {
+		t.Errorf("UnMarshal incorrectly, have got %t\n", out)
+	}
 }
