@@ -34,8 +34,7 @@ func TestUnMarshal(t *testing.T) {
 		},
 	}
 
-	ok := reflect.DeepEqual(out, expect)
-	if !ok {
+	if !reflect.DeepEqual(out, expect) {
 		t.Errorf("UnMarshal incorrectly, have got %t\n", out)
 	}
 }
@@ -54,7 +53,7 @@ func TestUnMarshalObject(t *testing.T) {
 		"data2": []interface{}{int64(1), int64(2), int64(3)},
 	}
 
-	if reflect.DeepEqual(out, expectData) {
+	if !reflect.DeepEqual(out, expectData) {
 		t.Errorf("UnMarshal incorrectly, have got %t\n", out)
 	}
 }
