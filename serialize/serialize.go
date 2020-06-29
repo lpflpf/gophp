@@ -2,6 +2,7 @@ package serialize
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"reflect"
 	"sort"
@@ -9,8 +10,9 @@ import (
 	"github.com/lpflpf/gophp/utils"
 )
 
-func Marshal(value interface{}) ([]byte, error) {
+var ErrMarshalUnknownType = errors.New("marshal: unknown type")
 
+func Marshal(value interface{}) ([]byte, error) {
 	if value == nil {
 		return MarshalNil(), nil
 	}
@@ -29,11 +31,15 @@ func Marshal(value interface{}) ([]byte, error) {
 		return MarshalMap(value)
 	case reflect.Slice:
 		return MarshalSlice(value)
-	default:
-		return nil, fmt.Errorf("Marshal: Unknown type %T with value %#v", t, value)
+	case reflect.Struct:
+		return MarshalStruct(value)
+	case reflect.Ptr:
+		return Marshal(t.Elem())
+	case reflect.Chan, reflect.Func, reflect.Complex64, reflect.Complex128:
+		// ignore
 	}
 
-	return nil, nil
+	return nil, ErrMarshalUnknownType
 }
 
 func MarshalNil() []byte {
@@ -102,6 +108,37 @@ func MarshalMap(value interface{}) ([]byte, error) {
 	}
 
 	return []byte(fmt.Sprintf("a:%d:{%s}", s.Len(), buffer.String())), nil
+}
+
+func MarshalStruct(value interface{}) ([]byte, error) {
+	var buffer bytes.Buffer
+	v := reflect.ValueOf(value)
+	t := reflect.TypeOf(value)
+	size := 0
+	var name string
+	for i := 0; i < v.NumField(); i++ {
+		if t.Field(i).PkgPath != "" {
+			continue
+		}
+		size += 1
+
+		if name = t.Field(i).Tag.Get("php"); name == "" {
+			name = t.Field(i).Name
+		}
+
+		m, err := Marshal(name)
+		if err != nil {
+			return nil, err
+		}
+		buffer.Write(m)
+
+		m, err = Marshal(v.Field(i).Interface())
+		if err != nil {
+			return nil, err
+		}
+		buffer.Write(m)
+	}
+	return []byte(fmt.Sprintf("a:%d:{%s}", size, buffer.String())), nil
 }
 
 func MarshalSlice(value interface{}) ([]byte, error) {

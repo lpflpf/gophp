@@ -26,22 +26,6 @@ func NumericalValue(value reflect.Value) (float64, bool) {
 	}
 }
 
-// lessValue compares two reflect.Value instances and returns true if a is
-// considered to be less than b.
-//
-// This function is used to sort keys for what amounts to associate arrays and
-// objects in PHP. These are represented as slices and maps in Go. Since Go
-// randomised map iterators we need to make sure we always return the keys of an
-// associative array or object in a predicable order.
-//
-// The keys can be numerical, strings or a combination of both. We treat numbers
-// (integers, unsigned integers and floats) as always less than strings. Numbers
-// are ordered by magnitude (ignoring types) and strings are orders
-// lexicographically.
-//
-// If keys are of any other type the behavior of the comparison is undefined. If
-// there is a legitimate reason why keys could be other types then this function
-// should be updated accordingly.
 func LessValue(a, b reflect.Value) bool {
 	aValue, aNumerical := NumericalValue(a)
 	bValue, bNumerical := NumericalValue(b)
@@ -51,12 +35,7 @@ func LessValue(a, b reflect.Value) bool {
 	}
 
 	if !aNumerical && !bNumerical {
-		// In theory this should mean they are both strings. In reality
-		// they could be any other type and the String() representation
-		// will be something like "<bool>" if it is not a string. Since
-		// distinct values of non-strings still return the same value
-		// here that's what makes the ordering undefined.
-		return strings.Compare(a.String(), b.String()) < 0
+		return strings.Compare(a.Interface().(string), b.Interface().(string)) > 0
 	}
 
 	// Numerical values are always treated as less than other types

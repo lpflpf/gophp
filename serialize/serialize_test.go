@@ -1,6 +1,8 @@
 package serialize
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestMarshalNil(t *testing.T) {
 
@@ -117,8 +119,25 @@ func TestMarshalString(t *testing.T) {
 	}
 }
 
-func TestMarshalMap(t *testing.T) {
+func TestMarshalStruct(t *testing.T) {
+	input := struct {
+		Language    string `php:"language"`
+		Description string `php:"description"`
+	}{
+		Language:    "PHP",
+		Description: "a popular general-purpose scripting language",
+	}
 
+	out, err := MarshalStruct(input)
+	if err != nil {
+		panic(err)
+	}
+	if string(out) != `a:2:{s:8:"language";s:3:"PHP";s:11:"description";s:44:"a popular general-purpose scripting language";}` {
+		t.Errorf("Map value marshaled incorrectly, have got %q\n", out)
+	}
+}
+
+func TestMarshalMap(t *testing.T) {
 	input := map[interface{}]interface{}{
 		"language":    "PHP",
 		"description": "a popular general-purpose scripting language",
@@ -147,8 +166,9 @@ func TestMarshalSlice(t *testing.T) {
 		panic(err)
 	}
 
-	if string(out) != `a:1:{i:0;a:2:{s:8:"language";s:3:"PHP";s:11:"description";s:44:"a popular general-purpose scripting language";}}` {
-		t.Errorf("Slice value marshaled incorrectly, have got %q\n", out)
+	src := `a:1:{i:0;a:2:{s:8:"language";s:3:"PHP";s:11:"description";s:44:"a popular general-purpose scripting language";}}`
+	if string(out) != src {
+		t.Errorf("Slice value marshaled incorrectly, %q\n, have got %q\n", src, out)
 	}
 }
 
