@@ -18,7 +18,6 @@ func UnMarshal(data []byte) (interface{}, error) {
 
 func unMarshalByReader(reader *bytes.Reader) (interface{}, error) {
 	for {
-
 		if token, _, err := reader.ReadRune(); err == nil {
 			switch token {
 			default:
@@ -36,14 +35,11 @@ func unMarshalByReader(reader *bytes.Reader) (interface{}, error) {
 			case 'a':
 				return unMarshalArray(reader)
 			case 'O':
-				_, _ = unMarshalString(reader, false)
-				return unMarshalArray(reader)
-				// case 'C':
-
-				// case 'R', 'r':
-
-				// case 'x':
-
+				return unMarshalObject(reader)
+			case 'R', 'r': // R 带指针的引用，r不带指针的引用
+				// 忽略
+			case 'C':
+				// 自定义序列化
 			}
 		}
 		return nil, nil
@@ -131,6 +127,11 @@ func unMarshalString(reader *bytes.Reader, isFinal bool) (interface{}, error) {
 		}
 	}
 	return val, nil
+}
+
+func unMarshalObject(reader *bytes.Reader) (interface{}, error) {
+	_, _ = unMarshalString(reader, false)
+	return unMarshalArray(reader)
 }
 
 func unMarshalArray(reader *bytes.Reader) (interface{}, error) {
